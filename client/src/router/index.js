@@ -9,7 +9,34 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: () => import("@/views/home")
+      component: () => import("@/views/home"),
+      children: [
+        {
+          path: '/',
+          name: 'Home',
+          component: () => import("@/components/Home"),
+        },
+        {
+          path: '/class',
+          name: 'ClassDetail',
+          component: () => import("@/components/ClassDetail"),
+        },
+        {
+          path: '/course',
+          name: 'Course',
+          component: () => import("@/components/Course"),
+        },
+        {
+          path: '/view/student',
+          name: 'ViewStudent',
+          component: () => import("@/components/ViewStudent"),
+        },
+        {
+          path: '/view/course',
+          name: 'ViewCourse',
+          component: () => import("@/components/ViewCourse"),
+        }
+      ]
     },
     {
       path: '/login',
