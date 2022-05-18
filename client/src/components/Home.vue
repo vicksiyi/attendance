@@ -80,11 +80,7 @@ export default {
         this.$message.error(_result.data.msg);
         return;
       }
-      this.tableData = _result.data.data.map((value) => {
-        value.num = 0;
-        value.total = 0;
-        return value;
-      });
+      this.tableData = _result.data.data;
     },
   },
   mounted() {

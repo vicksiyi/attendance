@@ -8,7 +8,12 @@ class _Class extends Handle {
         return super.commit(sql);
     }
     query_class(user_uuid){
-        const sql = `select * from class where user_uuid = '${user_uuid}'`;
+        const sql = `select c.id,c.title,c.time,
+        (select count(1) from students) as num,
+        (select count(1) from classrooms) as total from class c
+        left join classrooms cr on cr.class_id = c.id
+        left join students s on s.class_id = c.id 
+        where c.user_uuid = '${user_uuid}'`;
         return super.commit(sql);
     }
 }

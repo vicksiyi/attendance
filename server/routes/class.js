@@ -31,6 +31,7 @@ router.get('/get', passport.authenticate('jwt', { session: false }), async (req,
         return;
     }
     _result = utils.toJson(_result);
+    // 时间格式化
     _result = _result.data.map(value=>{
         value.time = utils.formatTimestamp(new Date(value.time).getTime());
         return value;
