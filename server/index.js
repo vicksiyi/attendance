@@ -4,7 +4,7 @@ const app = express();
 const passport = require('passport');
 const User = require('./routes/user');
 const _Class = require('./routes/class');
-const Upload = require("./routes/upload");
+const Course = require("./routes/course");
 const ClassRoom = require("./routes/classroom");
 
 // // 使用body-parser
@@ -15,7 +15,7 @@ app.use(passport.initialize());
 require('./config/userPassport')(passport);
 app.use('/api/user', User);
 app.use('/api/class', _Class);
-app.use('/api/upload', Upload);
+app.use('/api/course', Course);
 app.use('/api/classroom', ClassRoom);
 
 app.listen(5000, () => {

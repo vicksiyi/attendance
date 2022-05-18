@@ -194,7 +194,7 @@ export default {
       this.$message({ type: "success", message: "删除成功" });
     },
     nav(id) {
-      window.open(`/course?class_id=${this.class_id}&course_id=${id}`, "_blank");
+      window.open(`/course?class_id=${this.class_id}&classroom_id=${id}`, "_blank");
     },
     uploadSuccess(res, file) {
       if (res.code != 200) {
