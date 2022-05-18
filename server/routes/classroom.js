@@ -58,9 +58,9 @@ router.post('/importStudent', upload.single('data'), passport.authenticate('jwt'
 })
 
 // $routes /user/register
-// @desc 一键导入学生
+// @desc 获取学生数据
 // @access public
-router.get('/getStudent', upload.single('data'), passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/getStudent', passport.authenticate('jwt', { session: false }), async (req, res) => {
     let { class_id } = req.query;
     let _result = await classroom.query_student(class_id);
     if (_result.code != 200) {
@@ -75,7 +75,7 @@ router.get('/getStudent', upload.single('data'), passport.authenticate('jwt', { 
 // $routes /classroom/addStudent
 // @desc 手动添加
 // @access public
-router.post('/addStudent', upload.single('data'), passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/addStudent', passport.authenticate('jwt', { session: false }), async (req, res) => {
     let { class_id, name, number } = req.body;
     let _result = await classroom.insert_student(class_id, name, number);
     if (_result.code != 200) {
@@ -89,7 +89,7 @@ router.post('/addStudent', upload.single('data'), passport.authenticate('jwt', {
 // $routes /classroom/delStudent
 // @desc 手动删除
 // @access public
-router.put('/delStudent/:id', upload.single('data'), passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.put('/delStudent/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
     let { id } = req.params;
     let _result = await classroom.delete_student(id);
     if (_result.code != 200) {
@@ -98,5 +98,36 @@ router.put('/delStudent/:id', upload.single('data'), passport.authenticate('jwt'
         return;
     }
     res.json({ code: 200 })
+})
+
+// $routes /classroom/addCourse
+// @desc 添加课程
+// @access public
+router.post('/addCourse', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { class_id, title } = req.body;
+    let _result = await classroom.insert_course(class_id, title);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    res.json({ code: 200 })
+})
+
+// $routes /classroom/getCourse
+// @desc 获取课程
+// @access public
+router.get('/getCourse', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { class_id } = req.query;
+    let _result = await classroom.query_course(class_id);
+    if (_result.code != 200) {
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    _result = utils.toJson(_result).data.map(value=>{
+        value.time = utils.formatTimestamp(new Date(value.time).getTime());
+        return value;
+    });
+    res.json({ code: 200, data: _result })
 })
 module.exports = router;

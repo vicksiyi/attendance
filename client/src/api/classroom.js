@@ -21,3 +21,17 @@ export const delStudent = function (id) {
         method: "put"
     })
 }
+
+export const addCourse = function (parms) {
+    return axios.request({
+        url: `/api/classroom/addCourse`,
+        method: 'post',
+        data: parms
+    })
+}
+
+export const getCourse = function (id) {
+    return axios.request({
+        url: `/api/classroom/getCourse?class_id=${id}`
+    })
+}

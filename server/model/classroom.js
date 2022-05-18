@@ -16,6 +16,17 @@ class ClassRoom extends Handle {
         const sql = `delete from students where id = ${id}`;
         return super.commit(sql);
     }
+    insert_course(class_id, title) {
+        const sql = `insert into classrooms(class_id,title) values(${class_id},
+            '${title}')`;
+        return super.commit(sql);
+    }
+    query_course(class_id) {
+        const sql = `select cs.*,
+        (select count(1) from classrooms_data cd where cd.classroom_id = cs.id) as num 
+        from classrooms cs where cs.class_id = ${class_id}`;
+        return super.commit(sql);
+    }
 }
 const classroom = new ClassRoom();
 module.exports = classroom;

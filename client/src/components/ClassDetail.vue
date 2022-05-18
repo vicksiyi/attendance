@@ -68,6 +68,7 @@
             :data="courses"
             height="350"
             border
+            v-loading="loadingCourse"
             style="width: 100%; margin-top: 20px"
           >
             <el-table-column label="序号" width="80">
@@ -75,17 +76,17 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="date" label="创建时间" width="180">
+            <el-table-column prop="time" label="创建时间" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="名称"> </el-table-column>
+            <el-table-column prop="title" label="名称"> </el-table-column>
             <el-table-column label="课堂数">
               <template slot-scope="scope">
-                <el-tag type="warning">{{ scope.row.total }}</el-tag>
+                <el-tag type="warning">{{ scope.row.num }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="120">
-              <template>
-                <el-button @click="nav" type="success" size="mini"
+              <template slot-scope="scope">
+                <el-button @click="nav(scope.row.id)" type="success" size="mini"
                   >进入课程</el-button
                 >
               </template>
@@ -111,22 +112,10 @@
           ></SubmitStudent>
         </div>
         <div v-else>
-          <el-form
-            :model="courseForm"
-            :rules="courseRules"
-            ref="courseForm"
-            label-width="100px"
-          >
-            <el-form-item label="课程名称">
-              <el-input
-                v-model="courseForm.name"
-                placeholder="请输入课程名称"
-              ></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button style="width: 100%" type="primary">添加</el-button>
-            </el-form-item>
-          </el-form>
+          <SubmitCourse
+            :class_id="class_id"
+            @closeDrawer="courseClose"
+          ></SubmitCourse>
         </div>
       </div>
     </el-drawer>
@@ -135,12 +124,13 @@
 
 <script>
 import { getQueryVariable } from "@/common/utils";
-import { getStudent, delStudent } from "@/api/classroom";
+import { getStudent, delStudent, getCourse } from "@/api/classroom";
 import { mapState } from "vuex";
 import SubmitStudent from "./ClassDetail/SubmitStudent";
+import SubmitCourse from "./ClassDetail/SubmitCourse";
 export default {
   name: "ClassDetail",
-  components: { SubmitStudent },
+  components: { SubmitStudent, SubmitCourse },
   computed: {
     ...mapState({
       token: (state) => state.header.token,
@@ -158,14 +148,9 @@ export default {
       direction: "rtl",
       students: [],
       courses: [],
-      courseForm: {
-        name: "",
-      },
-      courseRules: {
-        name: { required: true, message: "请输入课程名称", trigger: "blur" },
-      },
       isStudent: true,
       loadingStudent: false,
+      loadingCourse: false,
     };
   },
   methods: {
@@ -187,6 +172,16 @@ export default {
       }
       this.students = _result.data.data;
     },
+    async getCourse() {
+      this.loadingCourse = true;
+      let _result = await getCourse(this.class_id);
+      this.loadingCourse = false;
+      if (_result.data.code != 200) {
+        this.$message.error(_result.data.msg);
+        return;
+      }
+      this.courses = _result.data.data;
+    },
     async delStudent(id) {
       this.loadingStudent = true;
       let _result = await delStudent(id);
@@ -198,8 +193,8 @@ export default {
       this.getStudent();
       this.$message({ type: "success", message: "删除成功" });
     },
-    nav() {
-      window.open("/course?class_id=xxxxxxxx&course_id=xxxxxxxxxx", "_blank");
+    nav(id) {
+      window.open(`/course?class_id=${this.class_id}&course_id=${id}`, "_blank");
     },
     uploadSuccess(res, file) {
       if (res.code != 200) {
@@ -213,11 +208,16 @@ export default {
       this.drawer = false;
       this.getStudent();
     },
+    courseClose() {
+      this.drawer = false;
+      this.getCourse();
+    },
   },
   mounted() {
     document.title = "班级管理";
     this.class_id = getQueryVariable("class_id");
     this.getStudent();
+    this.getCourse();
   },
 };
 </script>
