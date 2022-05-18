@@ -35,3 +35,10 @@ export const getCourse = function (id) {
         url: `/api/classroom/getCourse?class_id=${id}`
     })
 }
+
+
+export const getStudentCourse = function (student_id, classroom_id) {
+    return axios.request({
+        url: `/api/classroom/getStudentCourse?student_id=${student_id}&classroom_id=${classroom_id}`
+    })
+}

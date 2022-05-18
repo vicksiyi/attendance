@@ -213,4 +213,24 @@ router.delete('/deleteCourse', passport.authenticate('jwt', { session: false }),
     }
     res.json({ code: 200 })
 })
+
+// $routes /course/getStudentCourse
+// @desc 获取某个用户的数据
+// @access private
+router.get('/getStudentCourse', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { student_id, classroom_id } = req.query;
+    let _result = await course.query_student_course(student_id, classroom_id);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    _result = utils.toJson(_result).data.map(value => {
+        value.start_time = value.start_time ? utils.formatTimestamp(new Date(value.start_time).getTime()) : "";
+        value.end_time = value.end_time ? utils.formatTimestamp(new Date(value.end_time).getTime()) : "";
+        value.time = value.time == "null" ? 0 : parseInt(utils.timeEvent(value.time) / 60);
+        return value;
+    });
+    res.json({ code: 200, data: _result })
+})
 module.exports = router;

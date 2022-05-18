@@ -60,7 +60,11 @@
       :direction="direction"
       size="100%"
     >
-      <Show :course_uuid="course_uuid"></Show>
+      <Show
+        :course_uuid="course_uuid"
+        :class_id="class_id"
+        :classroom_id="classroom_id"
+      ></Show>
     </el-drawer>
   </div>
 </template>

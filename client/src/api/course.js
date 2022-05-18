@@ -19,3 +19,9 @@ export const getCourseDetail = function (id) {
         url: `/api/course/getCourseDetail?classrooms_data_id=${id}`
     })
 }
+
+export const getStudentCourse = function (student_id, classroom_id) {
+    return axios.request({
+        url: `/api/course/getStudentCourse?student_id=${student_id}&classroom_id=${classroom_id}`
+    })
+}
