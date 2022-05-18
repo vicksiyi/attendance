@@ -33,12 +33,21 @@
       </el-table-column>
       <el-table-column prop="url" label="数据链接">
         <template slot-scope="scope">
-          <a :href="scope.row.url">{{scope.row.url}}</a>
+          <a :href="scope.row.url">{{ scope.row.url }}</a>
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作" width="180">
-        <el-button type="success" @click="show" size="mini">查看</el-button>
-        <el-button type="danger" size="mini">删除</el-button>
+        <template slot-scope="scope">
+          <el-button
+            type="success"
+            @click="show(scope.row.uuid, scope.row.name)"
+            size="mini"
+            >查看</el-button
+          >
+          <el-button @click="del(scope.row.uuid)" type="danger" size="mini"
+            >删除</el-button
+          >
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
@@ -46,12 +55,12 @@
     </el-pagination>
     <!-- 抽屉 -->
     <el-drawer
-      title="第一章 函数与极限-课堂数据"
+      :title="`${course_name}-课堂数据`"
       :visible.sync="drawer"
       :direction="direction"
       size="100%"
     >
-      <Show></Show>
+      <Show :course_uuid="course_uuid"></Show>
     </el-drawer>
   </div>
 </template>
@@ -60,7 +69,7 @@
 import { getQueryVariable } from "@/common/utils";
 import Show from "@/components/Course/Show";
 import { mapState } from "vuex";
-import { getCourse } from "@/api/course";
+import { getCourse, deleteCourse } from "@/api/course";
 export default {
   name: "Course",
   components: { Show },
@@ -78,40 +87,30 @@ export default {
     return {
       drawer: false,
       direction: "rtl",
-      details: [
-        {
-          start: "2022-03-13 08:00:00",
-          end: "2022-03-13 09:40:00",
-          name: "第一章 函数与极限",
-          url: "",
-        },
-        {
-          start: "2022-03-13 08:00:00",
-          end: "2022-03-13 09:40:00",
-          name: "第二章 导数与微分",
-          url: "",
-        },
-        {
-          start: "2022-03-13 08:00:00",
-          end: "2022-03-13 09:40:00",
-          name: "第三章 微分中值定理与导数应用",
-          url: "",
-        },
-        {
-          start: "2022-03-13 08:00:00",
-          end: "2022-03-13 09:40:00",
-          name: "第四章 不定积分",
-          url: "",
-        },
-      ],
+      courses: [],
       class_id: -1,
       classroom_id: -1,
       loading: false,
+      course_uuid: "",
+      course_name: "",
     };
   },
   methods: {
-    show() {
+    show(uuid, name) {
       this.drawer = true;
+      this.course_uuid = uuid;
+      this.course_name = name;
+    },
+    async del(uuid) {
+      this.loading = true;
+      let _result = await deleteCourse(uuid);
+      this.loading = false;
+      if (_result.data.code != 200) {
+        this.$message.error(_result.data.msg);
+        return;
+      }
+      this.getCourse();
+      this.$message({ type: "success", message: "删除成功" });
     },
     viewCourse() {
       window.open("/view/course?class_id=xxxxxxxx&course_id=xxxxxxx", "_blank");

@@ -162,17 +162,17 @@ router.post('/data', upload.single('data'), passport.authenticate('jwt', { sessi
 
 
 // $routes /course/getCourse
-// @desc 上传数据
+// @desc 获取数据
 // @access private
 router.get('/getCourse', passport.authenticate('jwt', { session: false }), async (req, res) => {
     let { classroom_id } = req.query;
-    let _result = await  course.query_course(classroom_id);
+    let _result = await course.query_course(classroom_id);
     if (_result.code != 200) {
         console.log(_result.err);
         res.json({ code: 400, msg: "未知错误" })
         return;
     }
-    _result = utils.toJson(_result).data.map(value=>{
+    _result = utils.toJson(_result).data.map(value => {
         value.start_time = utils.formatTimestamp(new Date(value.start_time).getTime());
         value.end_time = utils.formatTimestamp(new Date(value.end_time).getTime());
         return value;
@@ -180,4 +180,37 @@ router.get('/getCourse', passport.authenticate('jwt', { session: false }), async
     res.json({ code: 200, data: _result })
 })
 
+// $routes /course/getCourseDetail
+// @desc 获取课堂数据
+// @access private
+router.get('/getCourseDetail', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { classrooms_data_id } = req.query;
+    let _result = await course.query_course_data(classrooms_data_id);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    _result = utils.toJson(_result).data.map(value => {
+        value.start_time = value.start_time ? utils.formatTimestamp(new Date(value.start_time).getTime()) : "";
+        value.end_time = value.end_time ? utils.formatTimestamp(new Date(value.end_time).getTime()) : "";
+        value.time = value.time == "null" ? 0 : parseInt(utils.timeEvent(value.time) / 60);
+        return value;
+    });
+    res.json({ code: 200, data: _result })
+})
+
+// $routes /course/deleteCourse
+// @desc 删除课堂数据
+// @access private
+router.delete('/deleteCourse', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { classrooms_data_id } = req.query;
+    let _result = await course.delete_course_data(classrooms_data_id);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    res.json({ code: 200 })
+})
 module.exports = router;

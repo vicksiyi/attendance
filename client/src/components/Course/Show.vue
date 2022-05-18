@@ -1,16 +1,22 @@
 <template>
   <div class="show">
-    <el-table height="500" :data="tableData" border style="width: 100%">
-      <el-table-column prop="student_id" label="学号" width="180">
+    <el-table
+      v-loading="loading"
+      height="500"
+      :data="courses"
+      border
+      style="width: 100%"
+    >
+      <el-table-column prop="number" label="学号" width="180">
       </el-table-column>
       <el-table-column prop="name" label="姓名"> </el-table-column>
-      <el-table-column prop="start" label="入会时间">
+      <el-table-column prop="start_time" label="入会时间">
         <template slot-scope="scope">
-          <span v-if="isEdit(scope.$index)">{{ scope.row.start }}</span>
+          <span v-if="isEdit(scope.$index)">{{ scope.row.start_time }}</span>
           <div v-else>
             <el-time-picker
               placeholder="选择入会时间"
-              v-model="scope.row.start"
+              v-model="scope.row.start_time"
               style="width: 100%"
             ></el-time-picker>
           </div>
@@ -18,11 +24,11 @@
       </el-table-column>
       <el-table-column label="退会时间">
         <template slot-scope="scope">
-          <span v-if="isEdit(scope.$index)">{{ scope.row.end }}</span>
+          <span v-if="isEdit(scope.$index)">{{ scope.row.end_time }}</span>
           <div v-else>
             <el-time-picker
               placeholder="选择退会时间"
-              v-model="scope.row.end"
+              v-model="scope.row.end_time"
               style="width: 100%"
             ></el-time-picker>
           </div>
@@ -65,76 +71,25 @@
 </template>
 
 <script>
+import { getCourseDetail } from "@/api/course";
 export default {
   name: "Show",
+  props: {
+    course_uuid: {
+      type: String,
+      default: "",
+    }
+  },
+  watch: {
+    course_uuid() {
+      this.getData();
+    },
+  },
   data() {
     return {
-      tableData: [
-        {
-          student_id: "17124120220",
-          name: "陈xx",
-          start: "2022-05-13 08:00:00",
-          end: "2022-05-13 10:00:00",
-          time: 60,
-        },
-        {
-          student_id: "17124120221",
-          name: "陈yy",
-          start: "2022-05-13 08:10:00",
-          end: "2022-05-13 10:10:00",
-          time: 50,
-        },
-        {
-          student_id: "17124120222",
-          name: "陈zz",
-          start: "2022-05-13 08:00:00",
-          end: "2022-05-13 10:00:00",
-          time: 60,
-        },
-        {
-          student_id: "17124120223",
-          name: "陈aa",
-          start: "2022-05-13 08:10:00",
-          end: "2022-05-13 10:10:00",
-          time: 80,
-        },
-        {
-          student_id: "17124120224",
-          name: "陈bb",
-          start: "2022-05-13 08:00:00",
-          end: "2022-05-13 10:00:00",
-          time: 70,
-        },
-        {
-          student_id: "17124120225",
-          name: "陈cc",
-          start: "2022-05-13 08:10:00",
-          end: "2022-05-13 10:10:00",
-          time: 50,
-        },
-        {
-          student_id: "17124120226",
-          name: "陈dd",
-          start: "2022-05-13 08:00:00",
-          end: "2022-05-13 10:00:00",
-          time: 50,
-        },
-        {
-          student_id: "17124120227",
-          name: "陈ee",
-          start: "2022-05-13 08:10:00",
-          end: "2022-05-13 10:10:00",
-          time: 50,
-        },
-        {
-          student_id: "17124120228",
-          name: "陈ff",
-          start: "2022-05-13 08:00:00",
-          end: "2022-05-13 10:00:00",
-          time: 50,
-        },
-      ],
-      edits: [0, 3],
+      courses: [],
+      edits: [],
+      loading: false,
     };
   },
   methods: {
@@ -155,6 +110,19 @@ export default {
     save(index) {
       this.edits.splice(this.edits.indexOf(index), 1);
     },
+    async getData() {
+      this.loading = true;
+      let _result = await getCourseDetail(this.course_uuid);
+      this.loading = false;
+      if (_result.data.code != 200) {
+        this.$message.error(_result.data.msg);
+        return;
+      }
+      this.courses = _result.data.data;
+    },
+  },
+  mounted() {
+    this.getData();
   },
 };
 </script>
