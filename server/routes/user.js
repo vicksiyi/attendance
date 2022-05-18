@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
     } else {
         const rule = { uuid: _result.uuid };
         let token = await jwtToken(rule);
-        res.json({ code: 200, token: token })
+        res.json({ code: 200, token: `Bearer ${token}` })
     }
 })
 module.exports = router;

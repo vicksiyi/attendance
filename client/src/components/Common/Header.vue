@@ -5,13 +5,14 @@
     </div>
     <!-- 右边 -->
     <div class="header-right">
-      <h1>admin</h1>
-      <a href="/login">退出</a>
+      <h1>{{ account }}</h1>
+      <a @click="exit" href="/login">退出</a>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "Header",
   props: {
@@ -19,6 +20,11 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  computed: {
+    ...mapState({
+      account: (state) => state.header.account,
+    }),
   },
   data() {
     return {};
@@ -35,6 +41,9 @@ export default {
     nav() {
       this.$router.push("/");
     },
+    exit(){
+      this.$store.commit("header/setToken", "");
+    }
   },
   mounted: function () {},
 };

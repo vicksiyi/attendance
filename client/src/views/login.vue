@@ -47,6 +47,7 @@ import { login } from "@/api/user";
 import md5 from "js-md5";
 import { mapActions } from "vuex";
 import Loading from "@/common/loading";
+import form from "@/common/form";
 export default {
   name: "Login",
   data() {
@@ -66,7 +67,7 @@ export default {
     submitForm(formName) {
       let _this = this;
       const loading = Loading.start(this);
-      this.$refs[formName].validate(async (valid) => {
+      form.validate(this, formName).then(async (valid) => {
         if (valid) {
           let _data = this.ruleForm;
           let _result = await login({
@@ -79,7 +80,9 @@ export default {
             return;
           }
           this.$store.commit("header/setToken", _result.data.token);
+          this.$store.commit("header/updateAccount", _data.account);
           this.setTokenAsync(_result.data.token);
+          this.$message({ type: "success", message: "成功登录" });
           this.$router.replace("/");
           Loading.end(loading);
         } else {

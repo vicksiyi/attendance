@@ -6,9 +6,12 @@ class HttpRequest {
         this.baseUrl = baseUrl;
     }
     getInsideConfig() {
+        const vuex_local = JSON.parse(localStorage.getItem("vuex"));
         const config = {
             baseUrl: this.baseUrl,
-            headers: {}
+            headers: {
+                Authorization: vuex_local.header.token
+            }
         }
         return config
     }

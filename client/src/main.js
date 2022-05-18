@@ -33,6 +33,7 @@ Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Row)
 Vue.use(Input)
+Vue.use(Loading.directive);
 
 Vue.prototype.$http = http;
 Vue.prototype.$loading = Loading.service;

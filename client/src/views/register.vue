@@ -52,6 +52,7 @@
 import md5 from "js-md5";
 import { register } from "@/api/user";
 import Loading from "@/common/loading";
+import form from "@/common/form";
 export default {
   name: "Register",
   data() {
@@ -82,7 +83,7 @@ export default {
       let _this = this;
       let _data = this.ruleForm;
       const loading = Loading.start(this);
-      this.$refs[formName].validate(async (valid) => {
+      form.validate(this, formName).then(async (valid) => {
         if (valid) {
           let _result = await register({
             account: _data.account,

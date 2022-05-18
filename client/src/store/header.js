@@ -1,11 +1,15 @@
 export default {
     namespaced: true,
     state: {
-        token: ''
+        token: '',
+        account: ""
     },
     mutations: {
         setToken(state, val) {
             state.token = val;
+        },
+        updateAccount(state, val) {
+            state.account = val;
         }
     },
     actions: {
