@@ -49,6 +49,9 @@
   </div>
 </template>
 <script>
+import md5 from "js-md5";
+import { register } from "@/api/user";
+import Loading from "@/common/loading";
 export default {
   name: "Register",
   data() {
@@ -76,9 +79,24 @@ export default {
   },
   methods: {
     submitForm(formName) {
+      let _this = this;
+      let _data = this.ruleForm;
+      const loading = Loading.start(this);
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
+          let _result = await register({
+            account: _data.account,
+            passwd: md5(_data.password),
+          });
+          if (_result.data.code != 200) {
+            _this.$message.error(_result.data.msg);
+            Loading.end(loading);
+            return;
+          }
+          _this.$message({ type: "success", message: "成功注册" });
+          Loading.end(loading);
         } else {
+          Loading.end(loading);
           return false;
         }
       });

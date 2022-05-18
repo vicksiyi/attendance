@@ -43,6 +43,10 @@
   </div>
 </template>
 <script>
+import { login } from "@/api/user";
+import md5 from "js-md5";
+import { mapActions } from "vuex";
+import Loading from "@/common/loading";
 export default {
   name: "Login",
   data() {
@@ -58,11 +62,28 @@ export default {
     };
   },
   methods: {
+    ...mapActions("header", ["setTokenAsync"]),
     submitForm(formName) {
+      let _this = this;
+      const loading = Loading.start(this);
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          this.$router.push("/");
+          let _data = this.ruleForm;
+          let _result = await login({
+            account: _data.account,
+            passwd: md5(_data.password),
+          });
+          if (_result.data.code != 200) {
+            this.$message.error(_result.data.msg);
+            Loading.end(loading);
+            return;
+          }
+          this.$store.commit("header/setToken", _result.data.token);
+          this.setTokenAsync(_result.data.token);
+          this.$router.replace("/");
+          Loading.end(loading);
         } else {
+          Loading.end(loading);
           return false;
         }
       });
