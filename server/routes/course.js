@@ -13,6 +13,7 @@ const readXlsxFile = require('read-excel-file/node');
 const transaction = require("../model/transaction");
 const utils = require("../utils/utils");
 const course = require('../model/course');
+let xlsx = require("node-xlsx");
 
 async function putBuffer(des_file, buffer) {
     try {
@@ -261,5 +262,42 @@ router.get('/getCourseScale', passport.authenticate('jwt', { session: false }), 
         }
     })
     res.json({ code: 200, data: _data })
+})
+
+// $routes /course/getCoursXlsx
+// @desc 导出课堂数据
+// @access private
+router.get('/getCoursXlsx', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { classroom_id } = req.query;
+    let _result = await course.query_student_xslx(classroom_id);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    _result = utils.toJson(_result).data;
+    let _temp = {};
+    for (let i = 0; i < _result.length; i++) {
+        if (_temp[_result[i].student_id] == undefined) _temp[_result[i].student_id] = {
+            number: _result[i].number,
+            name: _result[i].name,
+            data: []
+        }
+        _temp[_result[i].student_id].data.push(_result[i].time = _result[i].time == "null" ? 0 : `${parseInt(utils.timeEvent(_result[i].time) / 60)}/分钟`)
+    }
+    let _data = []
+    Object.keys(_temp).forEach(key => {
+        _data.push([_temp[key].number, _temp[key].name])
+        _data[_data.length - 1].push(..._temp[key].data)
+    })
+    let _header = ["学号", '姓名'];
+    if (_data.length) {
+        for (let i = 2; i < _data[0].length; i++) {
+            _header.push(`第${i - 1}节课`);
+        }
+    }
+    _data.unshift(_header);
+    let buffer = xlsx.build([{ name: "考勤数据", data: _data }]);
+    res.json({ code: 200, buffer })
 })
 module.exports = router;

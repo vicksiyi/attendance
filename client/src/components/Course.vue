@@ -13,7 +13,9 @@
       >
         <el-button type="primary">上传课堂</el-button>
       </el-upload>
-      <el-button class="upload-btn" type="primary">导出数据</el-button>
+      <el-button @click="downloadXlsx" class="upload-btn" type="primary"
+        >导出数据</el-button
+      >
       <el-button class="upload-btn" @click="viewCourse" type="primary"
         >可视化数据</el-button
       >
@@ -74,6 +76,8 @@ import { getQueryVariable } from "@/common/utils";
 import Show from "@/components/Course/Show";
 import { mapState } from "vuex";
 import { getCourse, deleteCourse } from "@/api/course";
+import { getCoursXlsx } from "@/api/course";
+import Loading from "@/common/loading";
 export default {
   name: "Course",
   components: { Show },
@@ -139,6 +143,28 @@ export default {
         return;
       }
       this.courses = _result.data.data;
+    },
+    async downloadXlsx() {
+      const loading = Loading.start(this);
+      let _result = await getCoursXlsx(this.classroom_id);
+      Loading.end(loading);
+      if (_result.data.code != 200) {
+        this.$message.error(_result.data.msg);
+        return;
+      }
+      let buffer_data = new Buffer.from(_result.data.buffer.data);
+      this.exportFile(buffer_data, "考勤数据.xlsx");
+    },
+    exportFile: function (file, name) {
+      let url = window.URL.createObjectURL(new Blob([file]));
+      let link = document.createElement("a");
+      link.style.display = "none";
+      link.href = url;
+      link.setAttribute("download", name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // 下载完成移除元素
+      window.URL.revokeObjectURL(url); // 释放掉blob对象
     },
   },
   mounted() {

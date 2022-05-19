@@ -31,6 +31,13 @@ class Course extends Handle {
         where cd.classroom_id = ${classroom_id} order by cd.time asc;`;
         return super.commit(sql);
     }
+    query_student_xslx(classroom_id){
+        const sql = `select cdrs.*,st.name,st.number from classrooms_data_rel_student cdrs
+        inner join classrooms_data cd on cd.uuid = cdrs.classrooms_data_uuid
+        inner join students st on st.id = cdrs.student_id
+        where cd.classroom_id = ${classroom_id} order BY cdrs.classrooms_data_uuid;`;
+        return super.commit(sql);
+    }
 }
 const course = new Course();
 module.exports = course;

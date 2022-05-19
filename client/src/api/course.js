@@ -32,3 +32,9 @@ export const getCourseScale = function (classroom_id) {
         url: `/api/course/getCourseScale?classroom_id=${classroom_id}`
     })
 }
+
+export const getCoursXlsx = function (classroom_id) {
+    return axios.request({
+        url: `/api/course/getCoursXlsx?classroom_id=${classroom_id}`
+    })
+}
