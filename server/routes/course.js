@@ -283,7 +283,7 @@ router.get('/getCoursXlsx', passport.authenticate('jwt', { session: false }), as
             name: _result[i].name,
             data: []
         }
-        _temp[_result[i].student_id].data.push(_result[i].time = _result[i].time == "null" ? 0 : `${parseInt(utils.timeEvent(_result[i].time) / 60)}/分钟`)
+        _temp[_result[i].student_id].data.push(_result[i].time = _result[i].time == "null" ? "缺勤" : `${parseInt(utils.timeEvent(_result[i].time) / 60)}/分钟${parseInt(utils.timeEvent(_result[i].time) / 60) < 30 ? '[缺勤]' : ''}`)
     }
     let _data = []
     Object.keys(_temp).forEach(key => {
