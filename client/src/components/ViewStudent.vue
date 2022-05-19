@@ -31,8 +31,8 @@ export default {
         this.$message.error(_result.data.msg);
         return;
       }
-      this.chartData.xData = _result.data.data.map((value) => {
-        return value.start_time.split(" ")[0];
+      this.chartData.xData = _result.data.data.map((value,index) => {
+        return `${index + 1}节课`;
       });
       console.log(this.chartData.xData);
       this.chartData.series = [
@@ -61,7 +61,7 @@ export default {
     this.class_id = getQueryVariable("class_id");
     this.classroom_id = getQueryVariable("course_id");
     this.student_id = getQueryVariable("student_id");
-    this.student_name = getQueryVariable("student_name");
+    this.student_name = localStorage.getItem("_name")
     this.getData();
   },
 };

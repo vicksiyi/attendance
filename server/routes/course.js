@@ -233,4 +233,33 @@ router.get('/getStudentCourse', passport.authenticate('jwt', { session: false })
     });
     res.json({ code: 200, data: _result })
 })
+
+// $routes /course/getCourseScale
+// @desc 课程可视化数据
+// @access private
+router.get('/getCourseScale', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    let { classroom_id } = req.query;
+    let _result = await course.query_classroom_scale(classroom_id);
+    if (_result.code != 200) {
+        console.log(_result.err);
+        res.json({ code: 400, msg: "未知错误" })
+        return;
+    }
+    _result = utils.toJson(_result).data;
+    let _temp = {};
+    for (let i = 0; i < _result.length; i++) {
+        if (_temp[_result[i].classrooms_data_uuid] === undefined) _temp[_result[i].classrooms_data_uuid] = { total: 0, absence: 0 };
+        _temp[_result[i].classrooms_data_uuid].total++;
+        let _time = _result[i].time = _result[i].time == "null" ? 0 : parseInt(utils.timeEvent(_result[i].time) / 60);
+        if (_time === 0) _temp[_result[i].classrooms_data_uuid].absence++;
+    }
+    let _data = Object.keys(_temp).map(key => {
+        return {
+            key: key,
+            scale: Number(((1 - _temp[key].absence / _temp[key].total) * 100).toFixed(2)),
+            absence: _temp[key].absence
+        }
+    })
+    res.json({ code: 200, data: _data })
+})
 module.exports = router;

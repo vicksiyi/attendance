@@ -117,7 +117,10 @@ export default {
       this.$message({ type: "success", message: "删除成功" });
     },
     viewCourse() {
-      window.open("/view/course?class_id=xxxxxxxx&course_id=xxxxxxx", "_blank");
+      window.open(
+        `/view/course?class_id=${this.class_id}&classroom_id=${this.classroom_id}`,
+        "_blank"
+      );
     },
     uploadSuccess(res, file) {
       if (res.code != 200) {

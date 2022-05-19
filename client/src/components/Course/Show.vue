@@ -57,7 +57,10 @@
             size="mini"
             >保存</el-button
           >
-          <el-button type="success" @click="viewStudent(scope.row.student_id,scope.row.name)" size="mini"
+          <el-button
+            type="success"
+            @click="viewStudent(scope.row.student_id, scope.row.name)"
+            size="mini"
             >可视化</el-button
           >
           <el-button type="warning" size="mini">确认数据</el-button>
@@ -86,7 +89,7 @@ export default {
     classroom_id: {
       type: String,
       default: "",
-    }
+    },
   },
   watch: {
     course_uuid() {
@@ -101,9 +104,10 @@ export default {
     };
   },
   methods: {
-    viewStudent(id,name) {
+    viewStudent(id, name) {
+      localStorage.setItem("_name", name);
       window.open(
-        `/view/student?student_name=${name}&class_id=${this.class_id}&course_id=${this.classroom_id}&student_id=${id}`,
+        `/view/student?class_id=${this.class_id}&course_id=${this.classroom_id}&student_id=${id}`,
         "_blank"
       );
     },

@@ -24,6 +24,13 @@ class Course extends Handle {
         where cdrs.student_id = ${student_id} and cd.classroom_id = ${classroom_id};`;
         return super.commit(sql);
     }
+    query_classroom_scale(classroom_id) {
+        const sql = `select cdrs.id,cdrs.student_id,cdrs.classrooms_data_uuid,cdrs.time 
+        from classrooms_data_rel_student cdrs
+        inner join classrooms_data cd on cd.uuid = cdrs.classrooms_data_uuid
+        where cd.classroom_id = ${classroom_id} order by cd.time asc;`;
+        return super.commit(sql);
+    }
 }
 const course = new Course();
 module.exports = course;

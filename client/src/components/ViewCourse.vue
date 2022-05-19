@@ -1,16 +1,14 @@
 <template>
-  <div class="view-course">
-    <Echart
-      :height="400"
-      v-if="isChart"
-      :chartData="chartData"
-    ></Echart>
-    <h1>高等数学(一)-考勤数据</h1>
+  <div v-loading="loading" class="view-course">
+    <Echart :height="400" v-if="isChart" :chartData="chartData"></Echart>
+    <h1>{{ classroom_name }}-考勤数据</h1>
   </div>
 </template>
 
 <script>
+import { getQueryVariable } from "@/common/utils";
 import Echart from "@/components/Common/Echart";
+import { getCourseScale } from "@/api/course";
 export default {
   name: "ViewCourse",
   components: { Echart },
@@ -18,55 +16,56 @@ export default {
     return {
       isChart: false,
       chartData: {},
+      classroom_id: -1,
+      classroom_name: "",
+      loading: false,
     };
+  },
+  methods: {
+    async getCourseScale() {
+      this.loading = true;
+      let _result = await getCourseScale(this.classroom_id);
+      this.loading = false;
+      if (_result.data.code != 200) {
+        this.$message.error(_result.data.msg);
+        return;
+      }
+      this.chartData.xData = _result.data.data.map((value, index) => {
+        return `${index + 1}节课`;
+      });
+      this.chartData.series = [
+        {
+          name: "出勤率/%",
+          data: _result.data.data.map((value) => {
+            return value.scale;
+          }),
+          type: "bar",
+        },
+        {
+          name: "缺勤人数",
+          data: _result.data.data.map((value) => {
+            return value.absence;
+          }),
+          type: "bar",
+        },
+      ];
+      this.isChart = true;
+    },
   },
   mounted() {
     document.title = "课程可视化";
-    this.chartData.xData = [
-      "第一节课",
-      "第二节课",
-      "第三节课",
-      "第四节课",
-      "第五节课",
-      "第六节课",
-      "第七节课",
-      "第八节课",
-      "第九节课",
-      "第十节课",
-      "第十一节课",
-      "第十二节课",
-      "第十三节课",
-      "第十四节课",
-      "第十五节课",
-      "第十六节课",
-      "第十七节课",
-      "第十八节课",
-    ];
-    this.chartData.series = [
-      {
-        name: "出勤率/%",
-        data: [
-          80, 100, 95, 98, 100, 95, 98, 100, 95, 98, 100, 95, 98, 100, 95, 98,
-          100, 100,
-        ],
-        type: "bar",
-      },
-      {
-        name: "缺勤人数",
-        data: [5, 0, 2, 1, 0, 2, 1, 0, 2, 3, 2, 4, 1, 0, 2, 2, 5, 3],
-        type: "bar",
-      },
-    ];
-    this.isChart = true;
-  }
+    this.classroom_id = getQueryVariable("classroom_id");
+    this.classroom_name = localStorage.getItem("_classroom");
+    this.getCourseScale();
+  },
 };
 </script>
 
 <style scoped>
-.view-course{
-    text-align: center;
+.view-course {
+  text-align: center;
 }
-.view-course h1{
-    margin-top: 20px;
+.view-course h1 {
+  margin-top: 20px;
 }
 </style>

@@ -86,7 +86,10 @@
             </el-table-column>
             <el-table-column label="操作" width="120">
               <template slot-scope="scope">
-                <el-button @click="nav(scope.row.id)" type="success" size="mini"
+                <el-button
+                  @click="nav(scope.row.id, scope.row.title)"
+                  type="success"
+                  size="mini"
                   >进入课程</el-button
                 >
               </template>
@@ -193,8 +196,12 @@ export default {
       this.getStudent();
       this.$message({ type: "success", message: "删除成功" });
     },
-    nav(id) {
-      window.open(`/course?class_id=${this.class_id}&classroom_id=${id}`, "_blank");
+    nav(id, title) {
+      localStorage.setItem("_classroom", title);
+      window.open(
+        `/course?class_id=${this.class_id}&classroom_id=${id}`,
+        "_blank"
+      );
     },
     uploadSuccess(res, file) {
       if (res.code != 200) {
